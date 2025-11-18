@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Kruk Runner (Easter Egg)</title>
+    <style>
+        body {
+            background-color: #f7f7f7;
+            text-align: center;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        #game {
+            width: 600px;
+            height: 150px;
+            border-bottom: 3px solid #333;
+            position: relative;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        #dino {
+            width: 40px;
+            height: 40px;
+            background-color: #555;
+            position: absolute;
+            bottom: 0;
+            left: 50px;
+            transition: background-color 0.2s;
+            line-height: 40px;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        #cactus {
+            width: 20px;
+            height: 40px;
+            background-color: green;
+            position: absolute;
+            bottom: 0;
+            right: 0;
+        }
+
+        #score {
+            font-size: 1.5em;
+            color: #555;
+        }
+
+        #info {
+            color: #777;
+            margin-top: 15px;
+        }
+        
+        .jump-animation {
+            animation: jump 0.5s ease-out;
+        }
+        
+        @keyframes jump {
+            0% { bottom: 0; }
+            50% { bottom: 100px; }
+            100% { bottom: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div id="game">
+        <div id="dino">K</div>
+        <div id="cactus"></div>
+    </div>
+    <div id="score">Score: 0</div>
+    <div id="info">Naciśnij SPACJĘ, aby rozpocząć i skakać!</div>
+
+    <script>
+        const dino = document.getElementById('dino');
+        const cactus = document.getElementById('cactus');
+        const scoreDisplay = document.getElementById('score');
+        const info = document.getElementById('info');
+        const game = document.getElementById('game');
+
+        let isJumping = false;
+        let isGameOver = true;
+        let score = 0;
+        let cactusMoveInterval;
+        let scoreInterval;
+
+        function jump() {
+            if (isJumping || isGameOver) return;
+            
+            isJumping = true;
+            dino.classList.add('jump-animation');
+
+            setTimeout(() => {
+                dino.classList.remove('jump-animation');
+                isJumping = false;
+            }, 500);
+        }
+
+        function startGame() {
+            if (!isGameOver) return;
+            
+            isGameOver = false;
+            score = 0;
+            scoreDisplay.textContent = 'Score: 0';
+            info.textContent = 'Naciśnij SPACJĘ, aby skakać!';
+            cactus.style.right = '0px';
+
+            scoreInterval = setInterval(() => {
+                score++;
+                scoreDisplay.textContent = `Score: ${score}`;
+            }, 100);
+
+            let cactusRight = 0;
+            cactusMoveInterval = setInterval(() => {
+                
+                // Ruch kaktusa
+                cactusRight += 5;
+                cactus.style.right = cactusRight + 'px';
+
+                // Resetowanie kaktusa
+                if (cactusRight > 600) {
+                    cactusRight = 0;
+                    cactus.style.right = '0px';
+                    // Losowa zmiana prędkości/częstotliwości (dla urozmaicenia)
+                    cactus.style.animationDuration = (Math.random() * 0.8 + 1.2) + 's';
+                }
+
+                // Sprawdzanie kolizji
+                checkCollision();
+
+            }, 20);
+        }
+        
+        function checkCollision() {
+            const dinoRect = dino.getBoundingClientRect();
+            const cactusRect = cactus.getBoundingClientRect();
+
+            // Warunek kolizji
+            if (
+                cactusRect.left < dinoRect.right && 
+                cactusRect.right > dinoRect.left && 
+                cactusRect.top < dinoRect.bottom &&
+                cactusRect.bottom > dinoRect.top
+            ) {
+                gameOver();
+            }
+        }
+
+        function gameOver() {
+            isGameOver = true;
+            clearInterval(scoreInterval);
+            clearInterval(cactusMoveInterval);
+            info.textContent = `KONIEC GRY! Wynik: ${score}. Naciśnij SPACJĘ, aby spróbować ponownie.`;
+        }
+
+        document.addEventListener('keydown', (event) => {
+            if (event.code === 'Space') {
+                if (isGameOver) {
+                    startGame();
+                } else {
+                    jump();
+                }
+            }
+        });
+        
+        gameOver(); 
+    </script>
+</body>
+</html>

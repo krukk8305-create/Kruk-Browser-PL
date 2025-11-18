@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Kruk Browser UI</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:;">
+    <style>
+        /* --- Zmienne dla motywów --- */
+        :root {
+            /* Nowy domyślny motyw: Nicość (Dark Mode) */
+            --bg-color: #0d1117; --tab-bg: #161b22; --tab-bg-active: #23282f; --tab-text: #c9d1d9; --tab-close-hover: #ff6666; 
+            --nav-bg: #161b22; --input-bg: #30363d; --input-text: #c9d1d9; --btn-bg: #21262d; --btn-hover: #30363d; --border-color: #010409;
+            --min-bg: #34c759; --max-bg: #007aff; --close-bg: #ff3b30; 
+            --btn-radius: 8px; 
+            --title-color: #c9d1d9;
+            --focus-glow: 0 0 5px #007aff; 
+        }
+
+        /* Motyw Bezkres (Błękitno-Fioletowy) */
+        .theme-bezkres {
+            --bg-color: #4e7eff; 
+            --tab-bg: #5a8bff; --tab-bg-active: #729dff; --tab-text: #ffffff; 
+            --tab-close-hover: #ff6666; --nav-bg: #5a8bff; --input-bg: #80a6ff; --input-text: #ffffff;
+            --btn-bg: #729dff; --btn-hover: #80a6ff; --border-color: #3e6eff; 
+            --title-color: #ffffff;
+            --focus-glow: 0 0 5px #ffffff;
+        }
+
+        /* Motyw Koniec (Szary-Biały) */
+        .theme-koniec {
+            --bg-color: #e0e0e0; --tab-bg: #f0f0f0; --tab-bg-active: #ffffff; --tab-text: #333333; --tab-close-hover: #ff6666; 
+            --nav-bg: #f0f0f0; --input-bg: #ffffff; --input-text: #333333; --btn-bg: #cccccc; --btn-hover: #aaaaaa; --border-color: #c0c0c0;
+            --title-color: #333333;
+            --focus-glow: 0 0 5px #333333;
+        }
+
+        /* --- Podstawowy styl --- */
+        body {
+            margin: 0; padding: 0; background-color: var(--bg-color); font-family: Arial, sans-serif;
+            -webkit-user-select: none; overflow: hidden; display: flex; flex-direction: column;
+            height: 100px; transition: height 0.3s; border-bottom: 1px solid var(--border-color);
+        }
+
+        /* Pasek Tytułu/Okna */
+        #titlebar {
+            -webkit-app-region: drag; height: 32px; display: flex; justify-content: space-between;
+            align-items: center; background-color: var(--bg-color); color: var(--tab-text);
+            padding: 0 5px; z-index: 1000;
+        }
+        #titlebar.fullscreen { display: none; }
+        
+        #app-title {
+            -webkit-app-region: no-drag; 
+            font-size: 14px;
+            font-weight: bold;
+            margin-left: 10px;
+            color: var(--title-color);
+        }
+
+        #window-controls {
+            -webkit-app-region: no-drag;
+            display: flex;
+            align-items: center; 
+        }
+
+        /* Ulepszone przyciski okna (jak w macOS) */
+        .title-btn {
+            -webkit-app-region: no-drag; 
+            width: 14px; height: 14px; border-radius: 50%; 
+            margin: 0 4px; line-height: 1; text-align: center;
+            cursor: pointer; transition: background 0.1s;
+            color: transparent; font-size: 10px; padding: 0;
+            position: relative;
+        }
+        .title-btn:hover { opacity: 0.8; }
+        .title-btn.close-btn:hover { opacity: 1; } 
+        
+        #minimize-btn { background-color: var(--min-bg); }
+        #maximize-btn { background-color: var(--max-bg); }
+        #close-btn { background-color: var(--close-bg); }
+        
+        /* Centrowanie symbolu w okręgu */
+        .title-btn::before {
+            content: attr(data-symbol);
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            color: black; font-weight: bold;
+            display: none; 
+        }
+        .title-btn:hover::before {
+            display: block; 
+        }
+        
+
+        /* Pasek kart (Tabs) */
+        #tabs-bar {
+            height: 30px; display: flex; align-items: center; background-color: var(--bg-color);
+            padding: 0 5px; border-bottom: 1px solid var(--border-color); overflow-x: auto;
+            overflow-y: hidden; flex-shrink: 0; z-index: 999;
+        }
+        .tab {
+            display: flex; align-items: center; padding: 0 10px; height: 25px;
+            background-color: var(--tab-bg); color: var(--tab-text); border-radius: 5px 5px 0 0;
+            margin-right: 5px; cursor: pointer; min-width: 150px; max-width: 250px;
+            overflow: hidden; white-space: nowrap; text-overflow: ellipsis; transition: background 0.2s;
+            font-size: 12px; flex-shrink: 0; 
+        }
+        .tab:hover { background-color: var(--tab-bg-active); }
+        .tab.active { background-color: var(--tab-bg-active); font-weight: bold; }
+        .tab-close {
+            margin-left: 10px; font-weight: bold; line-height: 1; padding: 2px 4px;
+            border-radius: 3px; transition: background 0.1s, color 0.1s;
+        }
+        .tab-close:hover { background-color: var(--tab-close-hover); color: white; }
+        
+        /* POPRAWIONE WYRÓWNANIE PRZYCISKU + */
+        #new-tab-btn {
+            height: 25px; line-height: 25px; padding: 0 12px; 
+            background-color: var(--btn-bg); color: var(--tab-text); border-radius: 5px; 
+            cursor: pointer; margin-left: 5px; 
+            flex-shrink: 0; transition: background 0.1s;
+        }
+        #new-tab-btn:hover { background-color: var(--btn-hover); }
+        
+        .tab img.favicon { width: 16px; height: 16px; margin-right: 5px; border-radius: 3px; }
+        .home-icon { font-size: 16px; margin-right: 5px; line-height: 1; }
+
+
+        /* Pasek nawigacji (Navbar) */
+        #navbar {
+            height: 38px; display: flex; align-items: center; padding: 0 10px;
+            background-color: var(--nav-bg); flex-shrink: 0; z-index: 998;
+        }
+        .nav-btn {
+            background-color: var(--btn-bg); color: var(--tab-text); border: none;
+            padding: 5px 10px; margin-right: 5px; border-radius: 5px; cursor: pointer;
+            font-size: 18px; transition: background 0.1s, opacity 0.2s; line-height: 1;
+            width: 35px; text-align: center;
+        }
+        .nav-btn:hover { background-color: var(--btn-hover); }
+
+        .nav-btn:disabled {
+            opacity: 0.5; cursor: default; background-color: var(--btn-bg); 
+        }
+        .nav-btn:disabled:hover {
+            background-color: var(--btn-bg); 
+        }
+        
+        #url-input {
+            flex-grow: 1; padding: 5px 10px; border: 1px solid var(--border-color);
+            border-radius: 5px; margin: 0 10px; background-color: var(--input-bg);
+            color: var(--input-text); font-size: 14px; outline: none;
+            transition: box-shadow 0.2s;
+        }
+        #url-input:focus {
+             box-shadow: var(--focus-glow); border-color: transparent; 
+        }
+
+    </style>
+</head>
+<body class="theme-nicosc"> 
+    <div id="titlebar">
+        <div id="app-title">Kruk Browser</div>
+        <div id="window-controls">
+            <div class="title-btn" id="minimize-btn" title="Minimalizuj" data-symbol="—"></div>
+            <div class="title-btn" id="maximize-btn" title="Maksymalizuj/Przywróć" data-symbol="☐"></div>
+            <div class="title-btn close-btn" id="close-btn" title="Zamknij" data-symbol="X"></div>
+        </div>
+    </div>
+
+    <div id="tabs-bar">
+        <div id="new-tab-btn" title="Nowa karta">+</div>
+    </div>
+    
+    <div id="navbar">
+        <button class="nav-btn" id="back-btn" title="Wstecz" disabled>◀</button>
+        <button class="nav-btn" id="forward-btn" title="Dalej" disabled>▶</button>
+        <button class="nav-btn" id="reload-btn" title="Przeładuj">↺</button>
+        <input type="text" id="url-input" placeholder="Wpisz adres URL lub wyszukaj w Google">
+    </div>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+        
+            const krukAPI = window.krukAPI; 
+
+            if (!krukAPI) {
+                 console.error("KRUK ERROR: krukAPI is undefined. Preload script failed to load.");
+                 return;
+            }
+
+            const body = document.body;
+            const titlebar = document.getElementById('titlebar');
+            const tabsBar = document.getElementById('tabs-bar');
+            const newTabBtn = document.getElementById('new-tab-btn');
+            const urlInput = document.getElementById('url-input');
+            const backBtn = document.getElementById('back-btn');
+            const forwardBtn = document.getElementById('forward-btn');
+            const reloadBtn = document.getElementById('reload-btn');
+            const maximizeBtn = document.getElementById('maximize-btn');
+
+            document.getElementById('minimize-btn').onclick = () => krukAPI.send('window-minimize');
+            maximizeBtn.onclick = () => krukAPI.send('window-maximize');
+            document.getElementById('close-btn').onclick = () => krukAPI.send('window-close');
+
+            newTabBtn.onclick = () => krukAPI.send('new-tab');
+
+            function renderTabs(tabsData, activeIndex) {
+                tabsBar.querySelectorAll('.tab').forEach(t => t.remove());
+
+                tabsData.forEach((data, index) => {
+                    const tab = document.createElement('div');
+                    tab.classList.add('tab');
+                    if (index === activeIndex) {
+                        tab.classList.add('active');
+                    }
+                    
+                    tab.title = data.title; 
+                    
+                    let iconHtml = '';
+                    if (data.favicon === 'home-icon') {
+                        iconHtml = '<span class="home-icon">⌂</span>';
+                    } else if (data.favicon) {
+                        iconHtml = `<img src="${data.favicon}" class="favicon" onerror="this.style.display='none'">`;
+                    }
+
+                    tab.innerHTML = `
+                        ${iconHtml}
+                        ${data.title}
+                        <span class="tab-close" data-index="${index}">×</span>
+                    `;
+
+                    tab.onclick = (e) => {
+                        if (e.target.classList.contains('tab-close')) return;
+                        krukAPI.send('tab-click', index);
+                    };
+
+                    tab.querySelector('.tab-close').onclick = (e) => {
+                        e.stopPropagation();
+                        krukAPI.send('remove-tab', index);
+                    };
+
+                    tabsBar.insertBefore(tab, newTabBtn);
+                });
+                const activeTabElement = tabsBar.querySelector('.tab.active');
+                if (activeTabElement) {
+                    activeTabElement.scrollIntoView({ behavior: 'smooth', inline: 'nearest' });
+                }
+            }
+
+            urlInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    const url = urlInput.value.trim();
+                    if (url) {
+                        krukAPI.send('navigate', url);
+                        urlInput.blur(); 
+                    }
+                }
+            });
+
+            backBtn.onclick = () => krukAPI.send('nav', 'back');
+            forwardBtn.onclick = () => krukAPI.send('nav', 'forward');
+            reloadBtn.onclick = () => krukAPI.send('nav', 'reload');
+
+
+            krukAPI.on('tabs', (data) => renderTabs(data.tabs, data.active));
+            krukAPI.on('url-update', (url) => {
+                if (!urlInput.matches(':focus')) {
+                    urlInput.value = url;
+                }
+            });
+            krukAPI.on('nav-state', (state) => {
+                backBtn.disabled = !state.canGoBack;
+                forwardBtn.disabled = !state.canGoForward;
+            });
+            
+            krukAPI.on('fullscreen', (isFullscreen) => {
+                if (isFullscreen) {
+                    document.body.style.height = '0';
+                    titlebar.classList.add('fullscreen');
+                } else {
+                    document.body.style.height = '100px';
+                    titlebar.classList.remove('fullscreen');
+                }
+            });
+            
+            krukAPI.on("maximized-state", (isMaximized) => {
+                maximizeBtn.dataset.symbol = isMaximized ? "⧉" : "☐";
+            });
+            
+            krukAPI.on("theme-toggled", (theme) => {
+                body.className = `theme-${theme}`;
+            });
+        
+        }); 
+    </script>
+</body>
+</html>

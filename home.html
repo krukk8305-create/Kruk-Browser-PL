@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Strona Główna</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:;">
+    <style>
+        /* --- ZMIENNE MOTYWÓW --- */
+        :root {
+            --background-gradient: linear-gradient(135deg, #0d1117, #30363d);
+            --text-color: #c9d1d9;
+            --input-bg: #30363d;
+            --input-border: #555555;
+            --button-bg: #21262d;
+            --button-hover: #30363d;
+            --logo-color: #c9d1d9;
+            --menu-bg: #1e1e1e;
+            --menu-shadow: rgba(0, 0, 0, 0.7);
+        }
+
+        .theme-bezkres {
+            --background-gradient: linear-gradient(135deg, #4e7eff, #7d4eff); 
+            --text-color: #ffffff;
+            --input-bg: #80a6ff;
+            --input-border: #a0c0ff;
+            --button-bg: #5a8bff;
+            --button-hover: #729dff;
+            --logo-color: #ffffff;
+            --menu-bg: #6090ff;
+            --menu-shadow: rgba(0, 0, 0, 0.4);
+        }
+        
+        .theme-koniec {
+            --background-gradient: linear-gradient(135deg, #e0e0e0, #ffffff);
+            --text-color: #333333;
+            --input-bg: #ffffff;
+            --input-border: #cccccc;
+            --button-bg: #cccccc;
+            --button-hover: #aaaaaa;
+            --logo-color: #333333;
+            --menu-bg: #f5f5f5;
+            --menu-shadow: rgba(0, 0, 0, 0.2);
+        }
+
+
+        /* --- STYLIZACJA GŁÓWNA --- */
+        body {
+            margin: 0; padding: 0; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; height: 100vh; 
+            background: var(--background-gradient); color: var(--text-color);
+            font-family: Arial, sans-serif; transition: background 0.5s ease, color 0.5s ease;
+            position: relative; 
+        }
+
+        #content {
+            text-align: center; padding: 40px; 
+        }
+        
+        /* NOWY STYL DLA LOGO I NAZWY */
+        #logo-container {
+            margin-bottom: 25px;
+        }
+
+        #kruk-logo {
+            width: 80px; height: 80px; margin-bottom: 10px;
+            filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.4)); 
+            transition: filter 0.5s ease;
+        }
+        .theme-bezkres #kruk-logo { 
+             filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+        }
+
+
+        #app-name {
+            font-size: 3em; font-weight: 700;
+            color: var(--logo-color); transition: color 0.5s ease;
+        }
+
+        #search-box {
+            width: 500px; max-width: 80vw; padding: 10px 15px;
+            font-size: 1.1em; border: 2px solid var(--input-border);
+            border-radius: 25px; outline: none; background-color: var(--input-bg);
+            color: var(--text-color); transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        #search-box:focus {
+            border-color: var(--button-bg);
+            box-shadow: 0 0 8px var(--button-bg);
+        }
+        
+        /* --- MENU GŁÓWNE --- */
+        #main-menu-container {
+            position: absolute; top: 5px; right: 5px; z-index: 10;
+        }
+
+        #menu-btn {
+            background: none; border: none; color: var(--text-color);
+            font-size: 20px; cursor: pointer; padding: 5px 10px; 
+            border-radius: 4px; transition: background 0.3s;
+            line-height: 1; opacity: 0.8; font-weight: bold;
+        }
+
+        #menu-btn:hover {
+            background: var(--button-hover); opacity: 1;
+        }
+
+        #main-menu {
+            position: absolute; top: 40px; right: 0; width: 250px;
+            background: var(--menu-bg); border-radius: 8px;
+            box-shadow: 0 4px 12px var(--menu-shadow); padding: 10px;
+            display: none; opacity: 0; transition: opacity 0.3s ease;
+        }
+
+        #main-menu.visible {
+            display: block; opacity: 1;
+        }
+
+        .menu-option {
+            padding: 10px; margin-bottom: 5px; border-radius: 5px;
+            cursor: pointer; font-size: 0.9em; transition: background 0.2s;
+            text-align: left; color: var(--text-color);
+            font-weight: 600;
+        }
+
+        .menu-option:hover {
+            background: var(--button-hover);
+        }
+        
+        /* Sekcja z motywami */
+        .theme-section {
+            border-top: 1px solid var(--input-border);
+            padding-top: 10px;
+            margin-top: 5px;
+        }
+        .theme-option {
+            padding: 8px; margin-bottom: 5px; border-radius: 5px;
+            cursor: pointer; font-size: 0.9em; transition: background 0.2s;
+            text-align: left; color: var(--text-color);
+        }
+        .theme-option:hover {
+            background: var(--button-hover);
+        }
+
+
+        /* --- POPUP OGŁOSZEŃ --- */
+        #ogloszenia-popup {
+            display: none; position: fixed; top: 50%; left: 50%; 
+            transform: translate(-50%, -50%); 
+            width: 80%; max-width: 600px; max-height: 80vh;
+            background: var(--menu-bg); padding: 20px; border-radius: 10px;
+            box-shadow: 0 0 20px var(--menu-shadow); z-index: 100;
+            overflow: hidden;
+            border: 1px solid var(--input-border);
+        }
+        #ogloszenia-text {
+            white-space: pre-wrap; font-family: monospace; font-size: 14px;
+            max-height: 65vh; overflow-y: auto; padding-right: 15px; 
+        }
+        #ogloszenia-close {
+            float: right; font-size: 24px; font-weight: bold; cursor: pointer;
+            line-height: 1; color: var(--text-color);
+            background: none; border: none; padding: 0;
+            opacity: 0.7; transition: opacity 0.2s;
+        }
+        #ogloszenia-close:hover { opacity: 1; }
+
+    </style>
+</head>
+<body class="theme-nicosc"> 
+
+    <div id="main-menu-container">
+        <button id="menu-btn" title="Menu">⋮</button>
+
+        <div id="main-menu">
+            
+            <div class="menu-option" id="ogloszenia-btn">📢 Ogłoszenia i Wersje</div>
+            <div class="menu-option" id="dodatki-btn">🧩 Dodatki Chrome Web Store</div>
+            <div class="menu-option" id="ustawienia-dodatkow-btn">⚙️ Ustawienia i modyfikacje dodatków</div>
+            
+            <div class="menu-option">Motywy</div>
+            <div class="theme-section">
+                <div class="theme-option" data-theme="bezkres">Bezkres (Błękitny)</div>
+                <div class="theme-option" data-theme="nicosc">Nicość (Czarny)</div>
+                <div class="theme-option" data-theme="koniec">Koniec (Szary)</div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="content">
+        <div id="logo-container">
+            <img src="logo.ico" alt="Kruk Logo" id="kruk-logo">
+            <div id="app-name">Kruk Browser</div>
+        </div>
+        <input type="text" id="search-box" placeholder="Wpisz adres URL lub wyszukaj w Google">
+    </div>
+
+    <div id="ogloszenia-popup">
+        <button id="ogloszenia-close" title="Zamknij">&times;</button>
+        <h2>Ogłoszenia i Informacje o Wersjach</h2>
+        <pre id="ogloszenia-text">Ładowanie ogłoszeń...</pre>
+    </div>
+
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+        
+            const krukAPI = window.krukAPI; 
+
+            if (!krukAPI) {
+                 console.error("KRUK ERROR: krukAPI (home.html) is undefined. Preload script failed to load.");
+                 return;
+            }
+
+            const body = document.body;
+            const searchBox = document.getElementById('search-box');
+            const menuBtn = document.getElementById('menu-btn'); 
+            const menu = document.getElementById('main-menu');    
+            const themeBtns = document.querySelectorAll('.theme-option');
+
+            const ogloszeniaBtn = document.getElementById('ogloszenia-btn');
+            const dodatkiBtn = document.getElementById('dodatki-btn');
+            const ustawieniaDodatkowBtn = document.getElementById('ustawienia-dodatkow-btn'); 
+            
+            const ogloszeniaPopup = document.getElementById('ogloszenia-popup');
+            const ogloszeniaText = document.getElementById('ogloszenia-text');
+            const ogloszeniaClose = document.getElementById('ogloszenia-close');
+
+            function applyTheme(themeName) {
+                body.className = `theme-${themeName}`;
+                krukAPI.send('save-theme', themeName);
+            }
+            
+            // --- Logika Menu ---
+            menuBtn.onclick = (e) => {
+                menu.classList.toggle('visible');
+                e.stopPropagation();
+            };
+
+            document.addEventListener('click', (e) => {
+                if (!menu.contains(e.target) && e.target !== menuBtn) {
+                    menu.classList.remove('visible');
+                }
+            });
+
+            // --- Logika Motywów ---
+            themeBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    applyTheme(btn.dataset.theme);
+                    menu.classList.remove('visible');
+                });
+            });
+
+            // --- Logika Ogłoszeń ---
+            ogloszeniaBtn.onclick = async () => {
+                 menu.classList.remove('visible');
+                 ogloszeniaPopup.style.display = 'block';
+                 try {
+                     const content = await krukAPI.invoke('get-ogloszenia'); 
+                     ogloszeniaText.textContent = content;
+                 } catch (e) {
+                     ogloszeniaText.textContent = `Błąd: Nie udało się wczytać ogłoszeń. ${e.message}`;
+                 }
+            };
+
+            ogloszeniaClose.onclick = () => {
+                 ogloszeniaPopup.style.display = 'none';
+            };
+            
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    ogloszeniaPopup.style.display = 'none';
+                }
+            });
+            
+            // --- Logika Dodatków ---
+            dodatkiBtn.onclick = () => {
+                 krukAPI.send('open-chrome-addons');
+                 menu.classList.remove('visible');
+            };
+            
+            // --- Logika Ustawień Dodatków ---
+            ustawieniaDodatkowBtn.onclick = () => {
+                 krukAPI.send('open-addons-settings'); 
+                 menu.classList.remove('visible');
+            };
+
+
+            // --- Logika Wyszukiwania ---
+            searchBox.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    const query = e.target.value.trim();
+                    if (query) {
+                         krukAPI.send('navigate', query);
+                    }
+                }
+            });
+
+            // Odbieranie początkowego motywu od main.js 
+             krukAPI.on('initial-theme-load', (themeName) => {
+                body.className = `theme-${themeName}`;
+             });
+        
+        }); 
+    </script>
+</body>
+</html>

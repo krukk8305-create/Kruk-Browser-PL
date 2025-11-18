@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Ustawienia Rozszerzeń Kruk Browser</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline';">
+    <style>
+        body { font-family: Arial, sans-serif; padding: 40px; text-align: center; }
+        h1 { color: #007aff; }
+        .info-box { background: #f0f0f0; border: 1px solid #ccc; padding: 20px; border-radius: 8px; margin-top: 20px; text-align: left; }
+        .warning { color: red; font-weight: bold; }
+        .step { margin-bottom: 10px; }
+        /* Styl dla motywu ciemnego, aby pasował do Kruk */
+        @media (prefers-color-scheme: dark) {
+            body { background: #222; color: #fff; }
+            .info-box { background: #333; border-color: #555; }
+        }
+    </style>
+</head>
+<body>
+    <h1>Ustawienia i Modyfikacje Rozszerzeń</h1>
+    
+    <div class="info-box">
+        <p class="warning">
+            UWAGA: Kruk Browser (oparty na Electronie) nie obsługuje natywnej instalacji plików *.crx. 
+            Rozszerzenia muszą być ładowane ręcznie jako rozpakowane foldery przez konsolę.
+        </p>
+        
+        <p><strong>Jak ręcznie załadować rozszerzenie:</strong></p>
+        <div class="step">1. Pobierz rozszerzenie z Chrome Web Store i je rozpakuj.</div>
+        <div class="step">2. Otwórz to okno za pomocą klawisza **F12** (lub Ctrl+Shift+I).</div>
+        <div class="step">3. Użyj następującego kodu w konsoli, podając ścieżkę do rozpakowanego folderu:</div>
+        
+        <pre>
+            // Przykładowa ścieżka:
+            // C:\\Users\\TwojaNazwa\\Desktop\\MojeRozszerzenie\\
+            
+            const path = 'Wprowadź/Pełną/Ścieżkę/Do/Folderu/Rozszerzenia';
+            require('electron').remote.session.defaultSession.loadExtension(path)
+                .then(({ id }) => console.log('Rozszerzenie załadowane ID:', id))
+                .catch(err => console.error('Błąd ładowania rozszerzenia:', err));
+        </pre>
+        <p>Ta funkcja jest przeznaczona dla zaawansowanych użytkowników, którzy chcą testować własne rozszerzenia.</p>
+    </div>
+</body>
+</html>
