@@ -1,10 +1,7 @@
-=== Ostatnie Ogłoszenia Kruk Browser ===
+V 1.0================== 19.11.2025
+- Pierwsza w 100% działana wersja KB
+- Dodano trzy motywy: Bezkres,Koniec,Nicość
+- 
 
-Wersja 1.0.1 (Data: 16.11.2025)
-- Zaimplementowano menu rozwijane z ogłoszeniami i dodatkami.
-- Poprawiono obsługę motywów.
-- Przygotowania do dodania obsługi zakładek.
 
-Wersja 1.0.0 (Data: 15.11.2025)
-- Pierwsza stabilna wersja przeglądarki.
-- Dostępne trzy motywy kolorystyczne.
+TWOJA WERSJA PRZEGLĄDARKI: 1.0
