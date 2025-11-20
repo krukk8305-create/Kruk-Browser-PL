@@ -1,0 +1,240 @@
+/* Resetowanie i podstawowe style */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    user-select: none;
+    background-color: #f0f0f0;
+}
+
+/* --- PASEK TYTUŁOWY (GÓRNY) --- */
+#titlebar {
+    height: 32px;
+    background-color: #e0e0e0;
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    border-bottom: 1px solid #ccc;
+    box-sizing: border-box;
+    -webkit-app-region: drag; /* Pozwala na przeciąganie okna */
+}
+
+/* Kontener na karty */
+#tabs-container {
+    display: flex;
+    flex-grow: 1;
+    overflow-x: hidden;
+    height: 100%;
+}
+
+.tab-item {
+    -webkit-app-region: no-drag; /* Wyłącza przeciąganie okna nad kartą */
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    border-right: 1px solid #d0d0d0;
+    cursor: pointer;
+    background-color: #f9f9f9;
+    transition: background-color 0.2s;
+    min-width: 150px;
+    max-width: 250px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.tab-item:hover {
+    background-color: #f1f1f1;
+}
+
+.tab-item.active {
+    background-color: #fff;
+    border-bottom: 2px solid #007bff;
+    font-weight: bold;
+}
+
+.tab-title {
+    flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 10px;
+    font-size: 13px;
+}
+
+.close-tab {
+    -webkit-app-region: no-drag;
+    background: none;
+    border: none;
+    padding: 2px 5px;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    color: #666;
+    transition: color 0.2s;
+}
+
+.close-tab:hover {
+    color: #f00;
+}
+
+#new-tab-button {
+    -webkit-app-region: no-drag;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    height: 24px;
+    padding: 0 10px;
+    cursor: pointer;
+    margin-left: 5px;
+    line-height: 1;
+}
+
+/* --- PASEK ADRESOWY I NAWIGACJA --- */
+
+#navbar {
+    display: flex;
+    align-items: center;
+    height: 68px;
+    padding: 0 10px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    -webkit-app-region: no-drag; /* Nie chcemy przeciągać okna przez navbar */
+}
+
+#nav-controls button {
+    background: none;
+    border: 1px solid #ccc;
+    padding: 8px 12px;
+    margin-right: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+#nav-controls button:hover:not(:disabled) {
+    background-color: #f0f0f0;
+}
+
+#nav-controls button:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+#navbar-input {
+    flex-grow: 1;
+    height: 38px;
+    margin: 0 15px;
+    padding: 0 15px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    font-size: 16px;
+    outline: none;
+}
+
+/* --- MENU USTAWIEŃ --- */
+
+#settings-button {
+    background: none;
+    border: 1px solid #ccc;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 4px;
+    margin-left: auto; /* Wyrównuje do prawej */
+    position: relative;
+}
+
+#settings-menu {
+    position: absolute;
+    top: 100px; /* Pod paskiem nawigacji i tytułowym */
+    right: 10px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    padding: 10px;
+    width: 200px;
+    display: none;
+}
+
+#settings-menu.visible {
+    display: block;
+}
+
+#settings-menu h4 {
+    margin: 0 0 5px 0;
+    color: #007bff;
+    font-size: 14px;
+}
+
+#settings-menu a {
+    display: block;
+    padding: 8px 10px;
+    text-decoration: none;
+    color: #333;
+    transition: background-color 0.2s;
+    border-radius: 3px;
+    font-size: 14px;
+}
+
+#settings-menu a:hover {
+    background-color: #f0f0f0;
+}
+
+/* --- MOTYWY (TEMATY) --- */
+
+/* Ciemny motyw */
+.dark-theme #titlebar, .dark-theme #new-tab-button {
+    background-color: #2e2e2e;
+    color: #f0f0f0;
+    border-color: #444;
+}
+
+.dark-theme #navbar {
+    background-color: #3a3a3a;
+    box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
+}
+
+.dark-theme .tab-item {
+    background-color: #444;
+    color: #ccc;
+    border-color: #555;
+}
+
+.dark-theme .tab-item.active {
+    background-color: #555;
+    color: #fff;
+    border-bottom-color: #007bff;
+}
+
+.dark-theme #navbar-input {
+    background-color: #505050;
+    border-color: #666;
+    color: #fff;
+}
+
+.dark-theme #settings-menu, .dark-theme #settings-button {
+    background-color: #333;
+    color: #f0f0f0;
+    border-color: #555;
+}
+
+.dark-theme #settings-menu a {
+    color: #ccc;
+}
+
+.dark-theme #settings-menu a:hover {
+    background-color: #444;
+}
+
+.dark-theme #settings-menu h4 {
+    color: #88c0ff;
+}
+
+/* Bezkres motyw (przykład) */
+.bezkres-theme #titlebar, .bezkres-theme #navbar {
+    background-color: #1a237e; /* Ciemny niebieski */
+    color: #e8eaf6;
+}
+/* Wymagałoby rozbudowania dla pełnego motywu */
